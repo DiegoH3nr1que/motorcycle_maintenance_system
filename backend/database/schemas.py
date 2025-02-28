@@ -1,7 +1,9 @@
 from pydantic import BaseModel, EmailStr
 from typing import Optional, List
 from datetime import datetime
+import pytz
 
+brazil_tz = pytz.timezone("America/Sao_Paulo")
 # 📌 Schema para Motorcycle (Moto)
 class MotorcycleSchema(BaseModel):
     brand: str
@@ -20,8 +22,8 @@ class MotorcycleSchema(BaseModel):
 # 📌 Schema para Maintenance (Manutenção)
 class MaintenanceSchema(BaseModel):
     motorcycle_id: str
-    owner_id: str
-    maintenance_date: datetime
+    owner_id: Optional[str] = None
+    maintenance_date: datetime = datetime.now(brazil_tz).isoformat()
     odometer_km: int
     description: str
     maintenance_photos: List[str] = []
@@ -30,5 +32,5 @@ class MaintenanceSchema(BaseModel):
 class AdminSchema(BaseModel):
     username: str
     email: EmailStr
-    created_at: datetime
+    created_at: datetime = datetime.now(brazil_tz)
     last_login: Optional[datetime] = None
