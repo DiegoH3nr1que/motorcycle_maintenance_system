@@ -1,18 +1,21 @@
 from beanie import Document
 from typing import Optional, List
 from pydantic import BaseModel, EmailStr
-from datetime import datetime
+from datetime import datetime, date
 from passlib.context import CryptContext
+import pytz
+
+brazil_tz = pytz.timezone("America/Sao_Paulo")
 
 class Owner(Document):
     name_owner : str
     phone: str
     email: str
-    birth_date: datetime
+    birth_date: date
     cpf: Optional[str] = None
     cnpj: Optional[str] = None
     status: str = "Ativo"
-    created_at: datetime = datetime.utcnow()
+    created_at: datetime = datetime.now(brazil_tz)
 
     class Settings:
         collection = "owners"
@@ -36,8 +39,8 @@ class Motorcycle(Document):
 
 class Maintenance(Document):
     motorcycle_id: str  # Referência ao veículo (Motorcycle)
-    owner_id: str  # Referência ao proprietário (Owner)
-    maintenance_date: datetime 
+    owner_id: Optional[str]  # Referência ao proprietário (Owner)
+    maintenance_date: datetime = datetime.now(brazil_tz).isoformat()
     odometer_km: int 
     description: str
     maintenance_photos: List[str] = []  # URLs das fotos da manutenção (array)
@@ -51,7 +54,7 @@ class Admin(Document):
     username: str
     email: EmailStr  # Validação automática de e-mail
     password_hash: str  # Senha será armazenada como hash
-    created_at: datetime = datetime.utcnow()
+    created_at: datetime = datetime.now(brazil_tz)
     last_login: datetime = None  # Pode começar como None
 
     class Settings:
