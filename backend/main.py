@@ -1,10 +1,15 @@
 from fastapi import FastAPI
-
+from database.config import init_db
+from routers import admin, maintenance, motorcycle, owner
 app = FastAPI()
 
-@app.get("/")
-def read_root():
-    return {"message": "API de manutenção de veículos funcionando 🚀"}
+@app.on_event("startup")
+async def startup():
+    await init_db()
+
+app.include_router(motorcycle.router, prefix="/api")
+app.include_router(maintenance.router, prefix="/api")
+
 
 if __name__ == "__main__":
     import uvicorn
