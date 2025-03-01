@@ -40,14 +40,13 @@ class Motorcycle(Document):
 class Maintenance(Document):
     motorcycle_id: str  # Referência ao veículo (Motorcycle)
     owner_id: Optional[str]  # Referência ao proprietário (Owner)
-    maintenance_date: datetime = datetime.now(brazil_tz).isoformat()
+    maintenance_date: datetime = datetime.now(brazil_tz)
     odometer_km: int 
     description: str
     maintenance_photos: List[str] = []  # URLs das fotos da manutenção (array)
 
     class Settings:
         collection = "maintenance"
-
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 class Admin(Document):
