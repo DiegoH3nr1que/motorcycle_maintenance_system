@@ -1,5 +1,5 @@
 from beanie import Document
-from typing import Optional, List
+from typing import Optional, List, Literal
 from pydantic import BaseModel, EmailStr
 from datetime import datetime, date
 from passlib.context import CryptContext
@@ -14,7 +14,7 @@ class Owner(Document):
     birth_date: date
     cpf: Optional[str] = None
     cnpj: Optional[str] = None
-    status: str = "Ativo"
+    status: Literal["Ativo", "Inativo"] = "Ativo"
     created_at: datetime = datetime.now(brazil_tz)
 
     class Settings:
@@ -32,7 +32,7 @@ class Motorcycle(Document):
     last_maintenance: Optional[datetime] = None  # Última manutenção (pode ser nulo)
     maintenance_history: List[dict] = []  
     upcoming_maintenance: List[dict] = []
-    status: str  # Status: "Active", "Inactive", "Under Maintenance"
+    status: Literal["Ativo", "Inativo", "Em manutenção"] = "Ativo"
 
     class Settings:
         collection = "motorcycles"
