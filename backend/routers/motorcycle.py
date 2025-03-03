@@ -21,3 +21,18 @@ async def get_motorcycle(id: str):
     if not moto:
         raise HTTPException(status_code=404, detail="Moto não encontrada")
     return moto
+
+@router.patch("/motorcycles/{id}/reserve", response_model=MotorcycleSchema)
+async def reserve_motorcycle(id:str, renter_data: dict):
+    moto = await Motorcycle.get(id)
+    if not moto:
+        raise HTTPException(status_code=404, detail="Moto não encontrada")
+    
+    print(renter_data)
+
+    moto.owner_name = renter_data.get("owner_name")
+    moto.owner_cpf = renter_data.get("owner_cpf")
+    moto.owner_phone = renter_data.get("owner_phone")
+
+    await moto.save()
+    return moto

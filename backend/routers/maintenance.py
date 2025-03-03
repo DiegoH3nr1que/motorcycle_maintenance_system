@@ -45,8 +45,22 @@ async def list_maintenance():
     return await Maintenance.find_all().to_list()
 
 @router.get("/maintenance/{id}", response_model=MaintenanceSchema)
-async def get_motorcycle(id: str):
+async def get_maintenance(id: str):
     maintenance = await Maintenance.get(id)
     if not maintenance:
         raise HTTPException(status_code=404, detail="manutenção não encontrada")
     return maintenance
+
+@router.delete("/maintenance/{id}")
+async def delete_maintenance(id: str):
+    maintenance = await Maintenance.get(id)
+    if not maintenance:
+        raise HTTPException(status_code=404, detail="manutenção não encontrada")
+    
+    await remove_maintenance_from_motorcycle(maintenance)
+    await maintenance.delete()
+async def remove_maintenance_from_motorcycle(maintenance):
+    motorcycle = await Motorcycle.get(maintenance.motorcycle_id)
+    if motorcycle:
+        motorcycle.maintenance_history = [m for m in motorcycle.maintenance_history if m["date"] != maintenance.maintenance_date.isoformat()]
+        await motorcycle.save()

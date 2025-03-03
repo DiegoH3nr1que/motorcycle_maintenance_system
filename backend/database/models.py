@@ -1,7 +1,7 @@
 from beanie import Document
 from typing import Optional, List, Literal
 from pydantic import BaseModel, EmailStr
-from datetime import datetime, date
+from datetime import datetime, date, time
 from passlib.context import CryptContext
 import pytz
 
@@ -28,6 +28,7 @@ class Motorcycle(Document):
     plate: str  
     chassis: str  
     owner_name: Optional[str] = None  # Nome do proprietário (pode ser nulo)
+    owner_cpf: Optional[str] = None # CPF do proprietário (pode ser nulo)
     owner_phone: Optional[str] = None  # Telefone do proprietário (pode ser nulo)
     last_maintenance: Optional[datetime] = None  # Última manutenção (pode ser nulo)
     maintenance_history: List[dict] = []  
@@ -44,6 +45,7 @@ class Maintenance(Document):
     odometer_km: int 
     description: str
     maintenance_photos: List[str] = []  # URLs das fotos da manutenção (array)
+    checklist: List[Literal["Bom", "Regular", "Ruim"]] = []
 
     class Settings:
         collection = "maintenance"

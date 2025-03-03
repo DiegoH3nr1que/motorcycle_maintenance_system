@@ -27,6 +27,7 @@ class MaintenanceSchema(BaseModel):
     odometer_km: int
     description: str
     maintenance_photos: List[str] = []
+    checklist: List[Literal["Bom", "Regular", "Ruim"]] = []
 
 # 📌 Schema para Admin
 class AdminSchema(BaseModel):
