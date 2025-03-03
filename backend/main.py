@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from database.config import init_db
-from routers import admin, maintenance, motorcycle, owner
+from routers import maintenance, motorcycle
 app = FastAPI()
 
 @app.on_event("startup")

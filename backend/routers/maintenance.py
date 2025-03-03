@@ -12,17 +12,16 @@ router = APIRouter(prefix="/maintenances", tags=["Maintenances"] )
 async def create_maintenance(maintenance: MaintenanceSchema):
     brazil_tz = pytz.timezone("America/Sao_Paulo")
     new_maintenance = Maintenance(**maintenance.model_dump())
-    await new_maintenance.insert()
     
     # Buscar a moto associada
     motorcycle = await Motorcycle.get(maintenance.motorcycle_id)
     if not motorcycle:
         raise HTTPException(status_code=404, detail="Moto não encontrada")
-
+    
+    await new_maintenance.insert()
     # Criar um registro de manutenção para o histórico
     maintenance_record = {
-        "_id": str(ObjectId()),
-        "date": new_maintenance.maintenance_date.isoformat(),
+        "date": new_maintenance.maintenance_date,
         "description": new_maintenance.description
     }
 
@@ -57,15 +56,24 @@ async def get_maintenance(id: str):
 async def delete_maintenance(id: str):
     maintenance = await Maintenance.get(id)
     if not maintenance:
-        raise HTTPException(status_code=404, detail="manutenção não encontrada")
-    await maintenance.delete()
+        raise HTTPException(status_code=404, detail="Manutenção não encontrada")
+    
     await remove_maintenance_from_motorcycle(maintenance)
-    return maintenance
+    await maintenance.delete()
+    return {"message": "Manutenção removida com sucesso"}
 
 async def remove_maintenance_from_motorcycle(maintenance):
     motorcycle = await Motorcycle.get(maintenance.motorcycle_id)
     if motorcycle:
-        maintenances = motorcycle.maintenance_history
-        for maintenance in maintenances:
-            maintenance.maintenance_history["_id"] ==  maintenance.get(maintenance._id)
+        # Convertendo a data da manutenção para ISO 8601 para garantir a comparação correta
+        maintenance_date_iso = maintenance.maintenance_date
+        print(maintenance_date_iso)
+
+        # Filtra a lista removendo a manutenção com a data correspondente
+        motorcycle.maintenance_history = [
+            item for item in motorcycle.maintenance_history if item["date"] != maintenance.maintenance_date
+        ]
+
+        await motorcycle.save()
+
             
