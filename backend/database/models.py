@@ -40,7 +40,7 @@ class Motorcycle(Document):
 
 class Maintenance(Document):
     motorcycle_id: str  # Referência ao veículo (Motorcycle)
-    owner_id: Optional[str]  # Referência ao proprietário (Owner)
+    owner_name: Optional[str]  # Referência ao proprietário (Owner)
     maintenance_date: datetime = datetime.now(brazil_tz)
     odometer_km: int 
     description: str

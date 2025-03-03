@@ -3,6 +3,7 @@ from database.models import Maintenance, Motorcycle
 from database.schemas import MaintenanceSchema
 from typing import List
 from datetime import datetime
+from bson import ObjectId
 import pytz
 
 router = APIRouter(prefix="/maintenances", tags=["Maintenances"] )
@@ -11,7 +12,7 @@ router = APIRouter(prefix="/maintenances", tags=["Maintenances"] )
 async def create_maintenance(maintenance: MaintenanceSchema):
     brazil_tz = pytz.timezone("America/Sao_Paulo")
     new_maintenance = Maintenance(**maintenance.model_dump())
-    await new_maintenance.insert()\
+    await new_maintenance.insert()
     
     # Buscar a moto associada
     motorcycle = await Motorcycle.get(maintenance.motorcycle_id)
@@ -20,6 +21,7 @@ async def create_maintenance(maintenance: MaintenanceSchema):
 
     # Criar um registro de manutenção para o histórico
     maintenance_record = {
+        "_id": str(ObjectId()),
         "date": new_maintenance.maintenance_date.isoformat(),
         "description": new_maintenance.description
     }
@@ -56,11 +58,14 @@ async def delete_maintenance(id: str):
     maintenance = await Maintenance.get(id)
     if not maintenance:
         raise HTTPException(status_code=404, detail="manutenção não encontrada")
-    
-    await remove_maintenance_from_motorcycle(maintenance)
     await maintenance.delete()
+    await remove_maintenance_from_motorcycle(maintenance)
+    return maintenance
+
 async def remove_maintenance_from_motorcycle(maintenance):
     motorcycle = await Motorcycle.get(maintenance.motorcycle_id)
     if motorcycle:
-        motorcycle.maintenance_history = [m for m in motorcycle.maintenance_history if m["date"] != maintenance.maintenance_date.isoformat()]
-        await motorcycle.save()
+        maintenances = motorcycle.maintenance_history
+        for maintenance in maintenances:
+            maintenance.maintenance_history["_id"] ==  maintenance.get(maintenance._id)
+            

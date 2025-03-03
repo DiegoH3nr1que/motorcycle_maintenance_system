@@ -14,6 +14,7 @@ class MotorcycleSchema(BaseModel):
     chassis: str
     owner_name: Optional[str] = None
     owner_phone: Optional[str] = None
+    owner_cpf: Optional[str] = None
     last_maintenance: Optional[datetime] = None
     maintenance_history: List[dict] = []
     upcoming_maintenance: List[dict] = []
@@ -22,7 +23,7 @@ class MotorcycleSchema(BaseModel):
 # 📌 Schema para Maintenance (Manutenção)
 class MaintenanceSchema(BaseModel):
     motorcycle_id: str
-    owner_id: Optional[str] = None
+    owner_name: Optional[str] = None
     maintenance_date: datetime = datetime.now(brazil_tz)
     odometer_km: int
     description: str
